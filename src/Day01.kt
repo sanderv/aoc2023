@@ -28,16 +28,13 @@ fun main() {
     }
 
     fun part1(input: List<String>): Int {
-        return input
-            .map { getValue(it) }
-            .sum()
+        return input.sumOf { getValue(it) }
     }
 
     fun part2(input: List<String>): Int {
         return input
             .map { replaceWordsWithDigits(it) }
-            .map { getValue(it) }
-            .sum()
+            .sumOf { getValue(it) }
     }
 
 
