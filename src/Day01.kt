@@ -23,13 +23,8 @@ fun main() {
             return ""
         }
         val found = (words.firstOrNull { line.startsWith(it) })
-        val result = if (found != null) {
-            (words.indexOf(found) + 1).toString() + replaceWordsWithDigits(line.drop(1))
-        } else {
-            line[0] + replaceWordsWithDigits(line.drop(1))
-        }
-
-        return result
+        val result = if (found != null) (words.indexOf(found) + 1).toString() else line.take(1)
+        return result + replaceWordsWithDigits(line.drop(1))
     }
 
     fun part1(input: List<String>): Int {
