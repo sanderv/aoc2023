@@ -19,18 +19,13 @@ fun main() {
     part2(input).println()
 }
 
-class Engine(input: List<String>, wantedSymbol: Char? = null) {
-    private val schematic: List<String>
+class Engine(schematic: List<String>, wantedSymbol: Char? = null) {
     private val symbols = mutableListOf<Symbol>()
     private val partNumbers = mutableListOf<PartNumber>()
 
     init {
-        schematic = input.map { ".$it." }.toMutableList()
-        schematic.add(0, ".".repeat(input[0].length + 2))
-        schematic.add(".".repeat(input[0].length + 2))
-
-        for (x in 0..schematic[0].length - 1) {
-            for (y in 0..schematic.size - 1) {
+        for (x in 0..<schematic[0].length) {
+            for (y in 0..<schematic.size) {
                 val char = schematic[y][x]
                 if (!char.isDigit() && char != '.') {
                     if (wantedSymbol == null || char == wantedSymbol) {
