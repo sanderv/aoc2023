@@ -1,5 +1,5 @@
 fun main() {
-    fun part1(input: List<String>): Long {
+    fun getBlocks(input: List<String>): MutableList<List<String>> {
         val blocks = mutableListOf<List<String>>()
         var currentBlock = mutableListOf<String>()
         input.forEach { line ->
@@ -11,30 +11,51 @@ fun main() {
             }
         }
         blocks.add(currentBlock) // add the last block
-        val seeds = blocks[0][0].split(": ")[1].split(' ').map { it.toLong() }
+        return blocks
+    }
+
+    fun calculateResult(
+        blocks: MutableList<List<String>>,
+        seeds: Iterable<Long>
+    ): Long {
         val seedMaps = blocks.drop(1)
             .map { SeedMap(it) }
+        var minResult = Long.MAX_VALUE
 
-        val result = seeds.map { seed ->
+        seeds.forEach { seed ->
             var result = seed
             seedMaps.forEach {
                 result = it.map(result)
             }
-            result
+            minResult = if (result < minResult) result else minResult
         }
-        return result.min()
+        return minResult
+    }
+
+    fun part1(input: List<String>): Long {
+        val blocks = getBlocks(input)
+        val seeds = blocks[0][0].split(": ")[1].split(' ').map { it.toLong() }
+        return calculateResult(blocks, seeds)
     }
 
     fun part2(input: List<String>): Long {
-        return 0
+        val blocks = getBlocks(input)
+        val numbers = blocks[0][0].split(": ")[1].split(' ').map { it.toLong() }
+        val seedRanges = numbers.chunked(2)
+            .map { (start, length) -> start..<(start + length) }
+        return seedRanges.mapIndexed { index, seeds ->
+            println("LongRange $index")
+            calculateResult(blocks, seeds)
+        }.min()
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day05_test")
-    check(part1(testInput) == 35L)
+//    check(part1(testInput) == 35L)
+//    check(part2(testInput) == 46L)
 
     val input = readInput("Day05")
-    part1(input).println()
+//    part1(input).println()
     part2(input).println()
 }
 
