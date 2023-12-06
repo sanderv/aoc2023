@@ -4,11 +4,9 @@ fun main() {
             .map { ms ->
                 // distance
                 (race.time - ms) * ms
-            }
-            .filter { distance ->
+            }.count { distance ->
                 distance > race.distance
             }
-            .count()
     }
 
     fun part1(input: List<String>): Int {
