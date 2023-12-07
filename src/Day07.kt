@@ -21,7 +21,7 @@ fun main() {
     part2(input).println()
 }
 
-class PokerHand(val input: String) : Comparable<PokerHand> {
+class PokerHand(input: String) : Comparable<PokerHand> {
     val cards: String
     val score: Int
     val bet: Int
