@@ -2,14 +2,15 @@ import CompassDirections.*
 
 
 fun main() {
-    fun printMap(map: List<List<TunnelSegment>>, filterLoop: Boolean) {
-        map.forEach { row ->
-            row.forEach { print(it.toSymbol(filterLoop)) }
-            println("")
+    fun getNewMap(map: List<List<TunnelSegment>>, filterLoop: Boolean, filterPipes: Boolean = false): List<String> {
+        return map.map { row ->
+            row
+                .map { it.toSymbol(filterLoop, filterPipes) }
+                .joinToString("")
         }
     }
 
-    fun part1(input: List<String>): Int {
+    fun part1(input: List<String>): Pair<List<List<TunnelSegment>>, Int> {
         val map = input.map { line ->
             line.map { char ->
                 TunnelSegment(char)
@@ -30,20 +31,43 @@ fun main() {
             currentEntry = currentEntry.value.findNextSegment(currentEntry.key.opposite())
             steps++
         }
-        printMap(map, true)
-        return steps / 2
+        val newMap = getNewMap(map, true, true).joinToString("\n")
+        println(newMap)
+        return Pair(map, steps / 2)
     }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        val newMap = getNewMap(part1(input).first, true, false)
+        val enclosedTileMap = newMap
+            .map { row ->
+                row
+                    .replace("-", "")
+                    .replace("F7", "")
+                    .replace("LJ", "")
+                    .replace("L7", "|")
+                    .replace("FJ", "|")
+            }
+            .map { row ->
+                row.mapIndexed { x, segment ->
+                    if (segment != '|') {
+                        val nrPipesToLeft = row.take(x).count { it == '|' }
+                        if (nrPipesToLeft % 2 == 0) ' '
+                        else '.'
+                    } else segment
+                }
+                    .joinToString("")
+            }
+        println(enclosedTileMap.joinToString("\n"))
+        return enclosedTileMap
+            .sumOf { row -> row.count { it == '.' } }
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day10_test")
-    check(part1(testInput) == 8)
+    check(part1(testInput).second == 8)
 
     val input = readInput("Day10")
-    part1(input).println()
+    part1(input).second.println()
     part2(input).println()
 }
 
@@ -65,17 +89,27 @@ class TunnelSegment(input: Char) {
         }
     }
 
-    fun toSymbol(filterLoop: Boolean): String {
+    fun toSymbol(filterLoop: Boolean, pretty: Boolean): String {
         return if (!filterLoop || partOfLoop) {
-            if (hasConnections(SOUTH, EAST)) "┏"
-            else if (hasConnections(EAST, WEST)) "━"
-            else if (hasConnections(WEST, SOUTH)) "┓"
-            else if (hasConnections(NORTH, SOUTH)) "┃"
-            else if (hasConnections(NORTH, WEST)) "┛"
-            else if (hasConnections(NORTH, EAST)) "┗"
-            else "▫"
+            if (pretty) {
+                if (hasConnections(SOUTH, EAST)) "┏"
+                else if (hasConnections(EAST, WEST)) "━"
+                else if (hasConnections(WEST, SOUTH)) "┓"
+                else if (hasConnections(NORTH, SOUTH)) "┃"
+                else if (hasConnections(NORTH, WEST)) "┛"
+                else if (hasConnections(NORTH, EAST)) "┗"
+                else "▫"
+            } else {
+                if (hasConnections(SOUTH, EAST)) "F"
+                else if (hasConnections(EAST, WEST)) "-"
+                else if (hasConnections(WEST, SOUTH)) "7"
+                else if (hasConnections(NORTH, SOUTH)) "|"
+                else if (hasConnections(NORTH, WEST)) "J"
+                else if (hasConnections(NORTH, EAST)) "L"
+                else "."
+            }
         } else {
-            "▫"
+            if (pretty) "▫" else "."
         }
     }
 
